@@ -97,3 +97,6 @@ requirements-local.txt
 # et les 47 maillages du robot. Le dépôt serait parti sans le robot.
 /assets/
 /assets_decor/
+
+# Campagne cloud : propre à un compte et à des crédits, hors périmètre.
+cloud/
