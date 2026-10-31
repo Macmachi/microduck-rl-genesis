@@ -85,12 +85,12 @@ fi
 
 BOX="${BOX_NAME:-$DEFAULT_BOX}"
 IMAGE="${BOX_IMAGE:-$DEFAULT_IMAGE}"
-VENV="${VENV_DIR:-$HOME/venvs/genesis}"
+VENV="${VENV_DIR:-}"   # vide = choisi après la création du conteneur
 PROJET="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "   conteneur : $BOX"
 echo "   image     : $IMAGE"
-echo "   venv      : $VENV"
+echo "   venv      : ${VENV:-auto (/opt/genesis/venv si présent, sinon ~/venvs/genesis)}"
 
 echo "== [2/6] Création du conteneur (image ~15-20 Go au 1er téléchargement) =="
 # Test d'existence par le moteur de conteneurs, en comparaison EXACTE (grep -qx).
@@ -106,8 +106,19 @@ else
         --additional-flags "$GPU_FLAGS"
 fi
 
+# Conteneur déjà équipé d'un venv commun (/opt/genesis/venv + lanceur
+# `genesis`) : on s'en sert plutôt que d'en créer un second dans ~/venvs
+# (~2,7 Go de doublon sur l'hôte). Le lanceur garde aussi les caches pip et
+# Genesis dans le conteneur au lieu de ~/.cache.
+LANCEUR=""
+if [ -z "$VENV" ] && distrobox enter "$BOX" -- test -x /usr/local/bin/genesis >/dev/null 2>&1; then
+    VENV=/opt/genesis/venv
+    LANCEUR=/usr/local/bin/genesis
+fi
+VENV="${VENV:-$HOME/venvs/genesis}"
+
 echo "== [3/6] Environnement Python ($VENV) =="
-distrobox enter "$BOX" -- bash -lc "
+distrobox enter "$BOX" -- $LANCEUR bash -lc "
 set -e
 if [ ! -f '$VENV/bin/activate' ]; then
     python3 -m venv '$VENV'

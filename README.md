@@ -22,7 +22,7 @@ Three commands, nothing installed on the host system:
 ```bash
 ./install.sh                                        # 1. the environment (isolated container)
 distrobox enter genesis-box                         #    then, inside the container:
-source ~/venvs/genesis/bin/activate
+source ~/venvs/genesis/bin/activate                 #    (or the venv printed by ./install.sh)
 python train.py -e smoke -B 64 --max-iterations 5   # 2. the smoke test (one minute)
 python train.py -e microduck-velocity -B 4096       # 3. the real training run
 ```
@@ -135,7 +135,7 @@ Genesis 1.2.2, rsl-rl-lib 5.4.2, Python 3.12.
 
 ```bash
 distrobox enter genesis-box
-source ~/venvs/genesis/bin/activate
+source ~/venvs/genesis/bin/activate   # or the venv printed at the end of ./install.sh
 cd microduck_rl_genesis
 
 # SMOKE TEST, always first. Five iterations at 64 envs catch most
